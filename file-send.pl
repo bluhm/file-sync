@@ -74,8 +74,8 @@ while (1) {
 	    next;
 	}
 	warn "transferred file '$file' successfully\n" if $opts{v};
-	unlink($file) or
-	    warn "remove '$file' failed: $!\n" unless $opts{q};
+	unlink($file) || $opts{q} or
+	    warn "remove '$file' failed: $!\n";
     }
     sleep 1;
 }
