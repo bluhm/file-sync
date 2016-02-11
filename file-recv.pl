@@ -58,14 +58,19 @@ while (1) {
 	my $buf;
 	my $len = 0;
 	do {
+	    NAME_MAX + 1 > $len or
+		die "file name too long\n";
 	    my $n = sysread($s, $buf, NAME_MAX + 1 - $len, $len);
 	    defined($n) or
 		die "read from socket failed: $!\n";
 	    $n > 0 or
 		die "end of file in file name\n";
 	    $len += $n;
-	} until $buf =~ s/^(.+)\0//s;
+	} until $buf =~ s,^(.+?)\0,,s;
 	$file = $1;
+	# prevent directory traversal attacks
+	$file =~ m,/, || $file eq "." || $file eq ".." and
+	    die "illegal file name";
 	unlink("$file.part");
 	open(my $fh, '>', "$file.part") or
 	    die "open '$file.part' for writing failed: $!";
