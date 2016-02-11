@@ -1,0 +1,30 @@
+File sync consists of a client and server process.  Files are pushed
+from the client to the server periodically.  The client scans a
+directory for new data files, transfers both name and content to
+the server and removes it after successful transmission.  The server
+creates the file, stores the content and acknowledges it if successful.
+
+In comparison to other syncing programs like rsync, the file sync
+client and sever use a very pritive oneway protocol to communicate.
+For every file a new TCP connection is established.  First the
+filename, then a NUL byte and finaly the file content is transferred.
+After that, the client does a write shutdown to signal end of file.
+The server will read everything including the end of file.  After
+that it can either close or abort the connection.  This results in
+a FIN or RST packet in the TCP stream to the client.  This is used
+as a one bit information by the client to distinguish between success
+and failure.
+
+To prevent that partial files are transferred, the client will
+ignore all files that end with a .part suffix.  So someone who fills
+the client's scan directoy, can create and write to a .part file
+and rename it atomically when it is complete.  The server first
+creates and writes to a file with a .part suffix appended.  When
+it receives end of file from the client, the file is renamed to the
+original name without the .part.
+
+This program has been written as an example for a protocol that can
+be sent over the genua cyber-diode.  File name and content are
+transferrd reliably but in the opposite direction no information
+except the one bit FIN or RST bit is leaked.
+https://www.genua.de/en/solutions/data-diode-for-industrial-applications.html
