@@ -46,18 +46,18 @@ while (1) {
 	    -f $file or
 		die "ignoring non regular file '$file'\n";
 	    open(my $fh, '<', $file) or
-		die "open '$file' failed: $!\n";
+		die "open '$file' for reading failed: $!\n";
 	    my $s = IO::Socket::INET->new(
 		PeerAddr => $ARGV[0],
 		PeerPort => $ARGV[1],
 		Proto    => "tcp",
 	    ) or die "tcp connect to @ARGV failed: $!\n";
 	    print $s "$file\0" or
-		die "write '$file' to socket failed: $!\n";
+		die "write file name to socket failed: $!\n";
 	    copy($fh, $s) or
 		die "copy file to socket failed: $!\n";
 	    close($fh) or
-		die "close '$file' failed: $!\n";
+		die "close file failed: $!\n";
 	    shutdown($s, 1) or
 		die "shutdown write to socket failed: $!\n";
 	    defined sysread($s, my $buf, 1) or

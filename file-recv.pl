@@ -72,7 +72,7 @@ while (1) {
 	close($fh) or
 	    die "close file failed: $!\n";
 	rename("$file.part", $file) or
-	    die "rename file to '$file' failed: $!\n";
+	    die "rename to '$file' failed: $!\n";
 	close($s) or
 	    die "close socket failed: $!\n";
     };
