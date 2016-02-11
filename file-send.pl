@@ -22,8 +22,8 @@ use IO::Socket::INET;
 
 sub usage {
     print STDERR <<'EOF';
-usage: file-send [-qv] [-D dir] receiver-addr receiver-port
-    -D dir  Directory to scan, defaults to current directoy
+usage: file-send [-qv] -D dir receiver-addr receiver-port
+    -D dir  Directory to scan
     -q      be quiet
     -v      be verbose
 EOF
@@ -34,10 +34,10 @@ my %opts;
 getopts("D:qv", \%opts) or usage();
 @ARGV == 2 or usage();
 
-if ($opts{D}) {
-    chdir $opts{D}
-	or die "chdir to '$opts{D}' failed: $!\n";
-}
+$opts{D} or
+    die "no working directory given\n";
+chdir $opts{D}
+    or die "chdir to '$opts{D}' failed: $!\n";
 
 while (1) {
     foreach my $file (<*>) {

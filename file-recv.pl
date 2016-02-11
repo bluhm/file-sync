@@ -25,8 +25,8 @@ use constant NAME_MAX => 255;
 
 sub usage {
     print STDERR <<'EOF';
-usage: file-recv [-qv] [-D dir] receiver-port
-    -D dir  Directory to fill, defaults to current directoy
+usage: file-recv [-qv] -D dir receiver-port
+    -D dir  Directory to fill
     -q      be quiet
     -v      be verbose
 EOF
@@ -37,10 +37,10 @@ my %opts;
 getopts("D:qv", \%opts) or usage();
 @ARGV == 1 or usage();
 
-if ($opts{D}) {
-    chdir $opts{D}
-	or die "chdir to '$opts{D}' failed: $!\n";
-}
+$opts{D} or
+    die "no working directory given\n";
+chdir $opts{D}
+    or die "chdir to '$opts{D}' failed: $!\n";
 
 my $ls = IO::Socket::INET->new(
     LocalPort => $ARGV[0],
