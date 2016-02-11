@@ -19,6 +19,7 @@ use warnings;
 use File::Copy;
 use Getopt::Std;
 use IO::Socket::INET;
+use Socket;
 
 use constant NAME_MAX => 255;
 
@@ -46,11 +47,14 @@ my $ls = IO::Socket::INET->new(
     Proto     => "tcp",
     Listen    => 1000,
 ) or die "tcp listen failed: $!\n";
+
 while (1) {
     my $file;
     eval {
 	accept(my $s, $ls) or
 	    die "accept failed: $!\n";
+	setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0)) or
+	    die "set socket linger failed: $!";
 	my $buf;
 	my $len = 0;
 	do {
@@ -73,6 +77,8 @@ while (1) {
 	    die "close file failed: $!\n";
 	rename("$file.part", $file) or
 	    die "rename to '$file' failed: $!\n";
+	setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 0, 0)) or
+	    die "reset socket linger failed: $!";
 	close($s) or
 	    die "close socket failed: $!\n";
     };
