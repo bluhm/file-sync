@@ -39,6 +39,8 @@ $opts{D} or
 chdir $opts{D}
     or die "chdir to '$opts{D}' failed: $!\n";
 
+$SIG{PIPE} = 'IGNORE';
+
 while (1) {
     foreach my $file (<*>) {
 	next if $file =~ /\.part$/;
@@ -52,6 +54,7 @@ while (1) {
 		PeerPort => $ARGV[1],
 		Proto    => "tcp",
 	    ) or die "tcp connect to @ARGV failed: $!\n";
+	    $| = 1;
 	    print $s "$file\0" or
 		die "write file name to socket failed: $!\n";
 	    copy($fh, $s) or
