@@ -5,9 +5,9 @@ the server and removes it after successful transmission.  The server
 creates the file, stores the content and acknowledges it if successful.
 
 In comparison to other syncing programs like rsync, the file sync
-client and sever use a very pritive oneway protocol to communicate.
+client and server use a very primitive oneway protocol to communicate.
 For every file a new TCP connection is established.  First the
-filename, then a NUL byte and finaly the file content is transferred.
+filename, then a NUL byte and finally the file content is transferred.
 After that, the client does a write shutdown to signal end of file.
 The server will read everything including the end of file.  After
 that it can either close or abort the connection.  This results in
@@ -25,6 +25,6 @@ original name without the .part.
 
 This program has been written as an example for a protocol that can
 be sent over the genua cyber-diode.  File name and content are
-transferrd reliably but in the opposite direction no information
+transferred reliably but in the opposite direction no information
 except the one bit FIN or RST bit is leaked.
 https://www.genua.de/en/solutions/data-diode-for-industrial-applications.html
