@@ -74,6 +74,8 @@ while (1) {
 	unlink("$file.part");
 	open(my $fh, '>', "$file.part") or
 	    die "open '$file.part' for writing failed: $!";
+	select($fh);
+	$| = 1;
 	print $fh $buf or
 	    die "write buffer to file failed: $!";
 	copy($s, $fh) or

@@ -54,6 +54,7 @@ while (1) {
 		PeerPort => $ARGV[1],
 		Proto    => "tcp",
 	    ) or die "tcp connect to @ARGV failed: $!\n";
+	    select($s);
 	    $| = 1;
 	    print $s "$file\0" or
 		die "write file name to socket failed: $!\n";
