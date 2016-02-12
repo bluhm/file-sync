@@ -49,7 +49,7 @@ my $ls = IO::Socket::INET->new(
 ) or die "tcp listen failed: $!\n";
 
 while (1) {
-    my $file;
+    my ($file, $filename);
     eval {
 	accept(my $s, $ls) or
 	    die "accept failed: $!\n";
@@ -70,12 +70,14 @@ while (1) {
 	    $len += $n;
 	} until $buf =~ s,^(.+?)\0,,s;
 	$file = $1;
+	# Do not print untrusted characters in error messages.
+	($filename = $file) =~ s,[^\w./_-],_,g;
 	# Prevent directory traversal attacks.
 	$file =~ m,/, || $file eq "." || $file eq ".." and
-	    die "illegal file name";
+	    die "illegal file name '$filename'";
 	unlink("$file.part");
 	open(my $fh, '>', "$file.part") or
-	    die "open '$file.part' for writing failed: $!";
+	    die "open '$filename.part' for writing failed: $!";
 	select($fh);
 	$| = 1;
 	print $fh $buf or
@@ -85,7 +87,7 @@ while (1) {
 	close($fh) or
 	    die "close file failed: $!\n";
 	rename("$file.part", $file) or
-	    die "rename to '$file' failed: $!\n";
+	    die "rename to '$filename' failed: $!\n";
 	setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 0, 0)) or
 	    die "reset socket linger failed: $!";
 	close($s) or
@@ -96,5 +98,5 @@ while (1) {
 	sleep 1;
 	next;
     }
-    warn "transferred file '$file' successfully\n" if $opts{v};
+    warn "transferred file '$filename' successfully\n" if $opts{v};
 }

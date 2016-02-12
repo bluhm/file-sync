@@ -43,12 +43,14 @@ $SIG{PIPE} = 'IGNORE';
 
 while (1) {
     foreach my $file (<*>) {
+	# Do not print untrusted characters in error messages.
+	(my $filename = $file) =~ s,[^\w./_-],_,g;
 	next if $file =~ /\.part$/;
 	eval {
 	    -f $file or
-		die "ignoring non regular file '$file'\n";
+		die "ignoring non regular file '$filename'\n";
 	    open(my $fh, '<', $file) or
-		die "open '$file' for reading failed: $!\n";
+		die "open '$filename' for reading failed: $!\n";
 	    my $s = IO::Socket::INET->new(
 		PeerAddr => $ARGV[0],
 		PeerPort => $ARGV[1],
@@ -65,7 +67,7 @@ while (1) {
 	    shutdown($s, 1) or
 		die "shutdown write to socket failed: $!\n";
 	    defined sysread($s, my $buf, 1) or
-		die "transfer file '$file' failed\n";
+		die "transfer file '$filename' failed\n";
 	    close($s) or
 		die "close socket failed: $!\n";
 	};
@@ -73,9 +75,9 @@ while (1) {
 	    warn $@ unless $opts{q};
 	    next;
 	}
-	warn "transferred file '$file' successfully\n" if $opts{v};
+	warn "transferred file '$filename' successfully\n" if $opts{v};
 	unlink($file) || $opts{q} or
-	    warn "remove '$file' failed: $!\n";
+	    warn "remove '$filename' failed: $!\n";
     }
     sleep 1;
 }
