@@ -55,6 +55,8 @@ while (1) {
 	    die "accept failed: $!\n";
 	setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0)) or
 	    die "set socket linger failed: $!";
+	# Use a loop over sysread instead of $/ = "\0"; $file = <$s>;
+	# This prevents that an attacker is exhausting our memory.
 	my $buf;
 	my $len = 0;
 	do {
@@ -68,7 +70,7 @@ while (1) {
 	    $len += $n;
 	} until $buf =~ s,^(.+?)\0,,s;
 	$file = $1;
-	# prevent directory traversal attacks
+	# Prevent directory traversal attacks.
 	$file =~ m,/, || $file eq "." || $file eq ".." and
 	    die "illegal file name";
 	unlink("$file.part");
