@@ -55,6 +55,8 @@ while (1) {
 	    die "accept failed: $!\n";
 	setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0)) or
 	    die "set socket linger failed: $!";
+	setsockopt($s, SOL_SOCKET, SO_KEEPALIVE, 1) or
+	    die "set socket keepalive failed: $!";
 	# Use a loop over sysread instead of $/ = "\0"; $file = <$s>;
 	# This prevents that an attacker is exhausting our memory.
 	my $buf;
