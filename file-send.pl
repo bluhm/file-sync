@@ -56,6 +56,8 @@ while (1) {
 		PeerPort => $ARGV[1],
 		Proto    => "tcp",
 	    ) or die "tcp connect to @ARGV failed: $!\n";
+	    setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 1, 0)) or
+		die "set socket linger failed: $!";
 	    setsockopt($s, SOL_SOCKET, SO_KEEPALIVE, 1) or
 		die "set socket keepalive failed: $!";
 	    setsockopt($s, SOL_SOCKET, SO_SNDTIMEO, pack("qq", 60, 0)) or
@@ -74,6 +76,8 @@ while (1) {
 		die "shutdown write to socket failed: $!\n";
 	    defined sysread($s, my $buf, 1) or
 		die "transfer file '$filename' failed\n";
+	    setsockopt($s, SOL_SOCKET, SO_LINGER, pack('ii', 0, 0)) or
+		die "reset socket linger failed: $!";
 	    close($s) or
 		die "close socket failed: $!\n";
 	};
