@@ -58,6 +58,10 @@ while (1) {
 	    ) or die "tcp connect to @ARGV failed: $!\n";
 	    setsockopt($s, SOL_SOCKET, SO_KEEPALIVE, 1) or
 		die "set socket keepalive failed: $!";
+	    setsockopt($s, SOL_SOCKET, SO_SNDTIMEO, pack("qq", 60, 0)) or
+		die "set socket send timeout failed: $!";
+	    setsockopt($s, SOL_SOCKET, SO_RCVTIMEO, pack("qq", 60, 0)) or
+		die "set socket receive timeout failed: $!";
 	    select($s);
 	    $| = 1;
 	    print $s "$file\0" or
