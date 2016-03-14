@@ -56,6 +56,8 @@ while (1) {
 		PeerPort => $ARGV[1],
 		Proto    => "tcp",
 	    ) or die "tcp connect to @ARGV failed: $!\n";
+	    setsockopt($s, SOL_SOCKET, SO_KEEPALIVE, 1) or
+		die "set socket keepalive failed: $!";
 	    select($s);
 	    $| = 1;
 	    print $s "$file\0" or
